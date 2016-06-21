@@ -1,6 +1,9 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## 0.0.78 — TBD
+* [`collapsible_if`] now considers `if let`
+
 ## 0.0.77 — 2016-06-21
 * Rustup to *rustc 1.11.0-nightly (5522e678b 2016-06-20)*
 * New lints: [`stutter`] and [`iter_nth`]
