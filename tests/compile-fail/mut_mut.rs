@@ -31,15 +31,12 @@ fn main() {
         let y : &mut &mut u32 = &mut &mut 2;
         //~^ ERROR generally you want to avoid `&mut &mut
         //~| ERROR generally you want to avoid `&mut &mut
-        //~| ERROR generally you want to avoid `&mut &mut
         **y + **x;
     }
 
     if fun(x) {
         let y : &mut &mut &mut u32 = &mut &mut &mut 2;
         //~^ ERROR generally you want to avoid `&mut &mut
-        //~| ERROR generally you want to avoid `&mut &mut
-        //~| ERROR generally you want to avoid `&mut &mut
         //~| ERROR generally you want to avoid `&mut &mut
         //~| ERROR generally you want to avoid `&mut &mut
         //~| ERROR generally you want to avoid `&mut &mut

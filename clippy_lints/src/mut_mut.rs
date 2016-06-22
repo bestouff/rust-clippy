@@ -1,5 +1,5 @@
-use rustc::hir;
 use rustc::hir::intravisit;
+use rustc::hir;
 use rustc::lint::*;
 use rustc::ty::{TypeAndMut, TyRef};
 use utils::{in_external_macro, recover_for_loop, span_lint};
@@ -28,14 +28,8 @@ impl LintPass for MutMut {
 }
 
 impl LateLintPass for MutMut {
-    fn check_block(&mut self, cx: &LateContext, block: &hir::Block) {
-        intravisit::walk_block(&mut MutVisitor { cx: cx }, block);
-    }
-
-    fn check_ty(&mut self, cx: &LateContext, ty: &hir::Ty) {
-        use rustc::hir::intravisit::Visitor;
-
-        MutVisitor { cx: cx }.visit_ty(ty);
+    fn check_crate(&mut self, cx: &LateContext, krate: &hir::Crate) {
+        krate.visit_all_items(&mut MutVisitor { cx: cx });
     }
 }
 
@@ -58,6 +52,7 @@ impl<'a, 'tcx, 'v> intravisit::Visitor<'v> for MutVisitor<'a, 'tcx> {
             // Let's ignore the generated code.
             intravisit::walk_expr(self, arg);
             intravisit::walk_expr(self, body);
+            return;
         } else if let hir::ExprAddrOf(hir::MutMutable, ref e) = expr.node {
             if let hir::ExprAddrOf(hir::MutMutable, _) = e.node {
                 span_lint(self.cx, MUT_MUT, expr.span, "generally you want to avoid `&mut &mut _` if possible");
@@ -68,6 +63,8 @@ impl<'a, 'tcx, 'v> intravisit::Visitor<'v> for MutVisitor<'a, 'tcx> {
                           "this expression mutably borrows a mutable reference. Consider reborrowing");
             }
         }
+
+        intravisit::walk_expr(self, expr);
     }
 
     fn visit_ty(&mut self, ty: &hir::Ty) {
